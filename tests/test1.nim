@@ -1,12 +1,35 @@
-# This is just an example to get you started. You may wish to put all of your
-# tests into a single file, or separate them into multiple `test1`, `test2`
-# etc. files (better names are recommended, just make sure the name starts with
-# the letter 't').
-#
-# To run these tests, simply execute `nimble test`.
-
 import unittest
 import Noun
+
+suite "First Declension":
+  test "via":
+    const word: Noun = [
+      Singular: [
+        Nom: "via",
+        Gen: "viae",
+        Dat: "viae",
+        Acc: "viam",
+        Abl: "viā",
+        Voc: "via",
+      ],
+      Plural: [
+        Nom: "viae",
+        Gen: "viārum",
+        Dat: "viīs",
+        Acc: "viās",
+        Abl: "viīs",
+        Voc: "viae",
+      ]
+    ]
+
+    check word == firstDeclension("via")
+
+  test "patria":
+    const word = firstDeclension("patria")
+    check word[Singular][Gen] == word[Plural][Nom]
+    check word[Singular][Nom] == word[Singular][Voc]
+    check word[Singular][Gen] == "patriae"
+    check word[Plural][Nom] == word[Plural][Voc]
 
 suite "Second Declension":
   test "campus":

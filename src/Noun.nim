@@ -69,3 +69,26 @@ func secondDeclension*(nomSing: string): Noun =
         Voc: stem & "a",
       ]
     ]
+
+func firstDeclension*(nomSing: string): Noun =
+  assert nomSing.endsWith("a")
+  let stem = nomSing[0 ..< nomSing.len - 1]
+  return [
+    Singular: [
+      Nom: nomSing,
+      Gen: stem & "ae",
+      Dat: stem & "ae",
+      Acc: stem & "am",
+      Abl: stem & "ā",
+      Voc: nomSing,
+    ],
+    Plural : [
+      Nom: stem & "ae",
+      Gen: stem & "ārum",
+      Dat: stem & "īs",
+      Acc: stem & "ās",
+      Abl: stem & "īs",
+      Voc: stem & "ae",
+    ]
+  ]
+

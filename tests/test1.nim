@@ -11,6 +11,7 @@ suite "First Declension":
         Acc: "viam",
         Abl: "viā",
         Voc: "via",
+        Loc: "",
       ],
       Plural: [
         Nom: "viae",
@@ -19,6 +20,7 @@ suite "First Declension":
         Acc: "viās",
         Abl: "viīs",
         Voc: "viae",
+        Loc: "",
       ]
     ]
 
@@ -31,16 +33,32 @@ suite "First Declension":
     check word[Singular][Gen] == "patriae"
     check word[Plural][Nom] == word[Plural][Voc]
 
+  test "Rōma":
+    const word = firstDeclension("Rōma", hasLocative = true)
+    check word[Singular][Loc] == "Rōmae"
+
+  test "xiphiās":
+    const word = firstDeclension("xiphiās")
+
+    check word[Singular][Nom] == "xiphiās"
+    check word[Singular][Gen] == "xiphiae"
+    check word[Singular][Acc] == "xiphiān"
+    check word[Singular][Voc] == "xiphiā"
+    check word[Plural][Acc] == "xiphiās"
+    check word[Plural][Voc] == "xiphiae"
+
+
 suite "Second Declension":
   test "campus":
     const word: Noun = [
       Singular: [
-          Nom: "campus",
-          Gen: "campī",
-          Dat: "campō",
-          Acc: "campum",
-          Abl: "campō",
-          Voc: "campe",
+        Nom: "campus",
+        Gen: "campī",
+        Dat: "campō",
+        Acc: "campum",
+        Abl: "campō",
+        Voc: "campe",
+        Loc: "",
       ],
       Plural: [
         Nom: "campī",
@@ -49,6 +67,7 @@ suite "Second Declension":
         Acc: "campōs",
         Abl: "campīs",
         Voc: "campī",
+        Loc: "",
       ]
     ]
 
@@ -63,6 +82,7 @@ suite "Second Declension":
         Acc: "adverbium",
         Abl: "adverbiō",
         Voc: "adverbium",
+        Loc: "",
       ],
       Plural: [
         Nom: "adverbia",
@@ -71,6 +91,7 @@ suite "Second Declension":
         Acc: "adverbia",
         Abl: "adverbiīs",
         Voc: "adverbia",
+        Loc: "",
       ]
     ]
 

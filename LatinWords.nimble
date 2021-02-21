@@ -5,7 +5,6 @@ author        = "Esther O'Keefe"
 description   = "A library for generating Latin word forms"
 license       = "MIT"
 srcDir        = "src"
-bin           = @["LatinWords"]
 
 # Dependencies
 

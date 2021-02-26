@@ -1,4 +1,6 @@
 # LatinWords
+![](https://img.shields.io/badge/👑-Nim-FFE220)
+![](https://img.shields.io/badge/🏺-Lingua%20Latīna-B57EDC)
 
 This is a Nim library intending to replicate the template logic used by Wiktionary to generate forms of Latin words.
 

@@ -5,30 +5,55 @@ import Types
 # Let's start with second, cause it's simple.
 
 # Forward declarations of public interface
-func declineNoun*(nomSing: string, declension: NounDeclension): Word
+func declineNoun*(reducedNoun: ReducedNoun): AllWordForms
 
 # Forward declarations of private functions
-func firstDeclension(nomSing: string,
-                     hasLocative = false,
-                     hasDativePluralInAbus = false): Word
+func firstDeclension(reducedNoun: ReducedNoun): AllWordForms
 
 
 ### Return noun declinations for the given Nominative Singular form according to
 ### the type of word in `declension`.
-func declineNoun*(nomSing: string, declension: NounDeclension): Word =
-  case declension
-  of NounDeclension.First:
-    return firstDeclension(nomSing)
-  of NounDeclension.FirstWithLocative:
-    return firstDeclension(nomSing, hasLocative = true)
-  of NounDeclension.FirstWithDativePluralInAbus:
-    return firstDeclension(nomSing, hasDativePluralInAbus = true)
+func declineNoun*(reducedNoun: ReducedNoun): AllWordForms =
+  case reducedNoun.declension
+  of NounDeclension.First, FirstWithLocative, FirstWithDativePluralInAbus:
+    return firstDeclension(reducedNoun)
 
 #
 #
 # First declension
 #
 #
+
+const
+  UnimplementedNounDeclension = [
+    Number.Single: [ Nom: "", Gen: "", Dat: "", Acc: "", Abl: "", Voc: "", Loc: "" ],
+    Number.Plural: [ Nom: "", Gen: "", Dat: "", Acc: "", Abl: "", Voc: "", Loc: "" ]
+  ]
+
+  StandardNounCaseEndings* = [
+    NounDeclension.First: [
+      Number.Single: [
+        Nom: "a",
+        Gen: "ae",
+        Dat: "ae",
+        Acc: "am",
+        Abl: "ā",
+        Voc: "a",
+        Loc: ""
+      ],
+      Number.Plural: [
+        Nom: "ae",
+        Gen: "ārum",
+        Dat: "īs",
+        Acc: "ās",
+        Abl: "īs",
+        Voc: "ae",
+        Loc: ""
+      ]
+    ],
+    NounDeclension.FirstWithLocative: UnimplementedNounDeclension,
+    NounDeclension.FirstWithDativePluralInAbus: UnimplementedNounDeclension,
+  ]
 
 func firstDeclensionStem(nomSing: string): string =
   let l = nomSing.len
@@ -39,13 +64,20 @@ func firstDeclensionStem(nomSing: string): string =
   else: assert false; return nomSing
 
 ### Produce declinations for a 1st declension noun
-func firstDeclension(nomSing: string,
-                     hasLocative = false,
-                     hasDativePluralInAbus = false): Word =
-  let stem = firstDeclensionStem(nomSing)
+func firstDeclension(reducedNoun: ReducedNoun): AllWordForms =
+  let
+    stem = firstDeclensionStem(reducedNoun.nomSing)
+    nomSing = reducedNoun.nomSing
+    hasLocative =
+      (reducedNoun.declension == NounDeclension.FirstWithLocative)
+    hasDativePluralInAbus =
+      (reducedNoun.declension == NounDeclension.FirstWithDativePluralInAbus)
   var
     forms: AllNounForms
-    gender: Gender = Gender.Feminine # Assumption.
+    # If the user knows the gender of this noun, use that, otherwise it'll be
+    # feminine because this is the first declension, land of the women.
+    retGender = (if reducedNoun.gender == Gender.Unknown: Gender.Feminine
+                 else: reducedNoun.gender)
 
   # Simplest case
   forms[Single][Nom] = stem & "a"
@@ -91,7 +123,7 @@ func firstDeclension(nomSing: string,
     forms[Single][Abl] = stem & "ē"
     forms[Single][Voc] = stem & "ē"
 
-  return Word(kind: WordKind.Noun, gender: gender, forms: forms)
+  return AllWordForms(kind: WordKind.Noun, gender: retGender, nounForms: forms)
 
 #
 #

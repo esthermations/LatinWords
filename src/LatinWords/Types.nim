@@ -1,36 +1,117 @@
 type
-  Case* = enum
-    Nom, Gen, Dat, Acc, Abl, Voc, Loc
+
+  Mood* = enum
+    Indicative = "indicative",
+    Subjunctive = "subjunctive",
+    Imperative = "imperative"
+
+  Voice* = enum
+    Active = "active",
+    Passive = "passive"
+
+  Aspect* = enum
+    Present = "present",
+    Imperfect = "imperfect",
+    Future = "future",
+    Perfect = "perfect",
+    Pluperfect = "pluperfect",
+    FuturePerfect = "future perfect"
 
   Number* = enum
-    Single, Plural
+    Single = "singular",
+    Plural = "plural"
+
+  Person* = enum
+    First = "first-person",
+    Second = "second-person",
+    Third = "third-person"
+
+  AllVerbalVerbForms* = array[Mood, array[Voice, array[Aspect, array[Number, array[Person, string]]]]]
+
+  NounCase* = enum
+    Nom = "nominative",
+    Gen = "genitive",
+    Dat = "dative",
+    Acc = "accusative",
+    Abl = "ablative",
+    Voc = "vocative",
+    Loc = "locative"
 
   Gender* = enum
-    Unknown, Masculine, Neuter, Feminine
+    Unknown = "unknown",
+    Masculine = "masculine",
+    Neuter = "neuter",
+    Feminine = "feminine"
 
-  AllNounForms* = array[Number, array[Case, string]]
+  AllNounForms* = array[Number, array[NounCase, string]]
 
-  NounDeclension* = enum
+  ### All info needed to produce all forms of a noun
+  ReducedNoun* = object
+    nomSing*: string
+    gender*: Gender
+    declension*: NounDeclension
+
+  ReducedVerb* = object
+    principalPart*: array[4, string]
+    conjugation*: VerbConjugation
+
+  VerbConjugation* {.pure.} = enum
     First,
-    FirstWithLocative,
-    FirstWithDativePluralInAbus,
 
-  WordKind* {.pure.} = enum Unknown, Noun
+  NounDeclension* {.pure.} = enum
+    First = "1",
+    FirstWithLocative = "1.loc",
+    FirstWithDativePluralInAbus = "1.abus",
 
-  Word* = object
+
+  WordKind* {.pure.} = enum Unknown, Noun, Verb
+
+  AllWordForms* = object
     case kind*: WordKind
     of WordKind.Unknown:
       nil
     of WordKind.Noun:
       gender*: Gender
-      forms*: AllNounForms
+      nounForms*: AllNounForms
+    of WordKind.Verb:
+      verbForms*: AllVerbalVerbForms
 
-func `==`*(a, b: Word): bool =
+  NounIdentifier* = tuple[nomSing: string, n: Number, c: NounCase]
+  VerbIdentifier* = tuple[
+    firstPrincipalPart: string,
+    m: Mood,
+    v: Voice,
+    a: Aspect,
+    n: Number,
+    p: Person
+  ]
+
+  WordForm* = object
+    word*: string
+    case kind*: WordKind
+    of WordKind.Unknown: nil
+    of WordKind.Noun: nounID*: NounIdentifier
+    of WordKind.Verb: verbID*: VerbIdentifier
+
+func getDictionaryForm*(w: WordForm): string =
+  case w.kind:
+  of WordKind.Unknown: ""
+  of WordKind.Noun: w.nounID.nomSing
+  of WordKind.Verb: w.verbID.firstPrincipalPart
+
+func getDictionaryForm*(w: AllWordForms): string =
+  case w.kind:
+  of WordKind.Unknown: ""
+  of WordKind.Noun: w.nounForms[Number.Single][NounCase.Nom]
+  of WordKind.Verb: w.verbForms[Mood.Indicative][Voice.Active][Aspect.Present][Number.Single][Person.First]
+
+func `==`*(a, b: AllWordForms): bool =
   if a.kind != b.kind:
     return false
   case a.kind
   of WordKind.Unknown: false
-  of Noun: (b.kind   == a.kind and
-            b.gender == a.gender and
-            b.forms  == a.forms)
+  of WordKind.Noun: (b.kind       == a.kind and
+                     b.gender     == a.gender and
+                     b.nounForms  == a.nounForms)
+  of WordKind.Verb: (a == b)
 

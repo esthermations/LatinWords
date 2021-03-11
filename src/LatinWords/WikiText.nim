@@ -61,7 +61,7 @@ func parseVerbTemplate(split: seq[string]): Option[AllWordForms] =
     of "1":
       return some conjugateVerb(firstPrincipalPart, VerbConjugation.First)
     of "1+", "1+.poet-sync-perf":
-      return some conjugateVerb(firstPrincipalPart, VerbConjugation.FirstWithPerfectStemInAv)
+      return some conjugateVerb(firstPrincipalPart, VerbConjugation.First, perfectStem = "āv")
 
 func parseTemplate*(s: string): Option[AllWordForms] =
   let split = s.strip(chars = {'{', '}'} + Whitespace).split('|')

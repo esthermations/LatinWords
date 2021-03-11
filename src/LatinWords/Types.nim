@@ -56,14 +56,12 @@ type
     conjugation*: VerbConjugation
 
   VerbConjugation* {.pure.} = enum
-    First,
-    FirstWithPerfectStemInAv,
+    First
 
   NounDeclension* {.pure.} = enum
     First = "1",
     FirstWithLocative = "1.loc",
     FirstWithDativePluralInAbus = "1.abus",
-
 
   WordKind* {.pure.} = enum Unknown, Noun, Verb
 

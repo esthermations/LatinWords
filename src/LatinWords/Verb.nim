@@ -2,18 +2,18 @@ import strutils
 import Types
 import VerbConstants
 
-func conjugateVerb*(firstPrincipalPart: string, conj: VerbConjugation): AllWordForms
+func conjugateVerb*(firstPrincipalPart: string, conj: VerbConjugation, perfectStem: string = ""): AllWordForms
 func firstConjugation(firstPrincipalPart: string, perfectStem: string = ""): AllWordForms
 
 # Standard suffixes
 
 ### firstPrincipalPart is e.g. "amō" for amāre
-func conjugateVerb*(firstPrincipalPart: string, conj: VerbConjugation): AllWordForms =
+func conjugateVerb*(firstPrincipalPart: string,
+                    conj: VerbConjugation,
+                    perfectStem: string = ""): AllWordForms =
   case conj:
   of VerbConjugation.First:
-    result = firstConjugation(firstPrincipalPart)
-  of VerbConjugation.FirstWithPerfectStemInAv:
-    result = firstConjugation(firstPrincipalPart, perfectStem = "āv")
+    result = firstConjugation(firstPrincipalPart, perfectStem = perfectStem)
 
 func firstConjugation(firstPrincipalPart: string,
                       perfectStem: string = ""): AllWordForms =

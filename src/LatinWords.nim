@@ -79,6 +79,8 @@ func getVerbStem*(verb: string): string =
               let
                 suffix = StandardVerbFormEndings[c][m][v][a][n][p]
                 suffixNoMacrons = suffix.deMacronise()
+              if suffix.len == 0:
+                continue
               if verb.endsWith(suffix):
                 let stem = verb[0 ..< verb.len - suffix.len]
                 return stem
@@ -95,6 +97,8 @@ func getNounStem*(noun: string): string =
         let
           suffix = StandardNounCaseEndings[d][n][c]
           suffixNoMacrons = suffix.deMacronise()
+        if suffix.len == 0:
+          continue
         if noun.endsWith(suffix):
           let stem = noun[0 ..< noun.len - suffix.len]
           return stem
@@ -104,9 +108,9 @@ func getNounStem*(noun: string): string =
   # Default value
   return ""
 
-
 func identifyVerb*(verb: string): Option[VerbIdentifier] =
   let stem = getVerbStem(verb)
+  if stem.len == 0: return
   for c in VerbConjugation:
     for m in Mood:
       for v in Voice:
@@ -122,6 +126,7 @@ func identifyVerb*(verb: string): Option[VerbIdentifier] =
 
 func identifyNoun*(noun: string): Option[NounIdentifier] =
   let stem = getNounStem(noun)
+  if stem.len == 0: return
   for d in NounDeclension:
     for n in Number:
       for c in NounCase:
@@ -140,5 +145,5 @@ func guessWordForm*(word: string): seq[WordForm] =
     nounOpt = identifyNoun(word)
     verbOpt = identifyVerb(word)
 
-  if nounOpt.isSome: result.add WordForm(kind: WordKind.Noun, nounID: nounOpt.get())
-  if verbOpt.isSome: result.add WordForm(kind: WordKind.Verb, verbID: verbOpt.get())
+  if nounOpt.isSome: result.add WordForm(word: word, kind: WordKind.Noun, nounID: nounOpt.get())
+  if verbOpt.isSome: result.add WordForm(word: word, kind: WordKind.Verb, verbID: verbOpt.get())

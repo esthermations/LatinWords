@@ -7,6 +7,7 @@ This is a Nim library intending to replicate the template logic used by Wiktiona
 ## Features
 
  - [x] First declension nouns
+ - [x] First conjugation verbs
 
 ## To-do
 

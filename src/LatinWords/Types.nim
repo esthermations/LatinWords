@@ -15,7 +15,7 @@ type
     Future = "future",
     Perfect = "perfect",
     Pluperfect = "pluperfect",
-    FuturePerfect = "future perfect"
+    FuturePerfect = "future-perfect"
 
   Number* = enum
     Single = "singular",
@@ -57,6 +57,7 @@ type
 
   VerbConjugation* {.pure.} = enum
     First,
+    FirstWithPerfectStemInAv,
 
   NounDeclension* {.pure.} = enum
     First = "1",
@@ -115,3 +116,10 @@ func `==`*(a, b: AllWordForms): bool =
                      b.nounForms  == a.nounForms)
   of WordKind.Verb: (a == b)
 
+func `==`*(a, b: WordForm): bool =
+  if a.kind != b.kind:
+    return false
+  case a.kind
+  of WordKind.Unknown: false
+  of WordKind.Noun: (a.nounID == b.nounID)
+  of WordKind.Verb: (a.verbID == b.verbID)

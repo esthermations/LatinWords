@@ -1,6 +1,7 @@
 import unittest, options
 import LatinWords
 import LatinWords/Types
+import TestConstants
 
 suite "getAllWordForms":
   const tests = [
@@ -8,43 +9,51 @@ suite "getAllWordForms":
     "{{la-verb|1+|clāmō}}"
   ]
 
-  test tests[0]:
+  test "amō":
     let wf = getAllWordForms(tests[0])
     check wf.kind == WordKind.Verb
-    var
-      m = Mood.Indicative
-      v = Voice.Active
-      a = Aspect.Present
-      n = Number.Single
-      p = Person.First
-    check wf.verbForms[m][v][a][n][p] == "amō"
-    v = Voice.Passive
-    check wf.verbForms[m][v][a][n][p] == "amor"
-    a = Aspect.Perfect
-    check wf.verbForms[m][v][a][n][p] == ""
+    for m in Mood:
+      for v in Voice:
+        for a in Aspect:
+          for n in Number:
+            for p in Person:
+              let
+                ours = wf.verbForms[m][v][a][n][p]
+                wikt =  AllAmoForms[m][v][a][n][p]
+              check ours == wikt
 
-  test tests[1]:
-    let wf = getAllWordForms(tests[1])
-    check wf.kind == WordKind.Verb
+
+  # TODO:
+  # test "clamō":
+  #   let wf = getAllWordForms(tests[1])
+  #   check wf.kind == WordKind.Verb
+
+suite "getVerbStem":
+  test "amō": check "amō".getVerbStem() == "am"
+  test "amo": check "amo".getVerbStem() == "am"
+  test "amās": check "amās".getVerbStem() == "am"
+  test "amas": check "amas".getVerbStem() == "am"
 
 suite "deMacronise":
   test "clamō": check "clamō".deMacronise() == "clamo"
   test "hīc": check "hīc".deMacronise() == "hic"
+  test "hic": check "hic".deMacronise() == "hic"
+  test "āīūēōȳĀĪŪĒŌȲ": check "āīūēōȳĀĪŪĒŌȲ".deMacronise() == "aiueoyAIUEOY"
 
 suite "guessWordForm":
-  const tests = [
-    "clamō",
-    "clamo",
-    "clamat"
-  ]
-  test tests[0]:
-    let wf = guessWordForm(tests[0])
-    check wf.len > 0
-  test tests[1]:
-    let wf = guessWordForm(tests[1])
-    check wf.len > 0
-  test tests[2]:
-    let wf = guessWordForm(tests[2])
+  test "clamō":
+    let wf = guessWordForm("clamō")
     check wf.len == 1
-    # check wf.kind == WordKind.Verb
+    if wf.len > 0:
+      check wf[0].kind == WordKind.Verb
+      if wf[0].kind == WordKind.Verb:
+        check wf[0].verbID.firstPrincipalPart == "clamō"
+  test "Ensure macrons don't affect results":
+    check guessWordForm("clamo") == guessWordForm("clamō")
+  test "clamō from clamat":
+    let wf = guessWordForm("clamat")
+    check wf.len == 1
+    if wf.len > 0:
+      check wf[0].kind == WordKind.Verb
+      check wf[0].verbID.firstPrincipalPart == "clamō"
     # check wf.getDictionaryForm() == "clamō"

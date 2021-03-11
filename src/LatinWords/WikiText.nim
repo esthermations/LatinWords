@@ -58,8 +58,10 @@ func parseVerbTemplate(split: seq[string]): Option[AllWordForms] =
   assert split[0] in VerbKeywords
   let firstPrincipalPart = split[2]
   case split[1]
-    of "1", "1+", "1+.poet-sync-perf":
+    of "1":
       return some conjugateVerb(firstPrincipalPart, VerbConjugation.First)
+    of "1+", "1+.poet-sync-perf":
+      return some conjugateVerb(firstPrincipalPart, VerbConjugation.FirstWithPerfectStemInAv)
 
 func parseTemplate*(s: string): Option[AllWordForms] =
   let split = s.strip(chars = {'{', '}'} + Whitespace).split('|')

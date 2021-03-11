@@ -3,17 +3,20 @@ import Types
 import VerbConstants
 
 func conjugateVerb*(firstPrincipalPart: string, conj: VerbConjugation): AllWordForms
-func firstConjugation(firstPrincipalPart: string): AllWordForms
+func firstConjugation(firstPrincipalPart: string, perfectStem: string = ""): AllWordForms
 
 # Standard suffixes
 
 ### firstPrincipalPart is e.g. "amō" for amāre
 func conjugateVerb*(firstPrincipalPart: string, conj: VerbConjugation): AllWordForms =
   case conj:
-  of VerbConjugation.First: firstConjugation(firstPrincipalPart)
+  of VerbConjugation.First:
+    result = firstConjugation(firstPrincipalPart)
+  of VerbConjugation.FirstWithPerfectStemInAv:
+    result = firstConjugation(firstPrincipalPart, perfectStem = "āv")
 
-
-func firstConjugation(firstPrincipalPart: string): AllWordForms =
+func firstConjugation(firstPrincipalPart: string,
+                      perfectStem: string = ""): AllWordForms =
   assert firstPrincipalPart.endsWith("ō")
   let stem = firstPrincipalPart[0 ..< firstPrincipalPart.len-2]
   const c = VerbConjugation.First
@@ -23,8 +26,10 @@ func firstConjugation(firstPrincipalPart: string): AllWordForms =
       for a in Aspect:
         for n in Number:
           for p in Person:
-            let suffix = StandardVerbFormEndings[c][m][v][a][n][p]
+            var suffix = StandardVerbFormEndings[c][m][v][a][n][p]
             if suffix.len > 0:
+              if a in [Aspect.Perfect, Aspect.Pluperfect, Aspect.FuturePerfect]:
+                suffix = perfectStem & suffix
               ret.verbForms[m][v][a][n][p] = stem & suffix
 
   return ret

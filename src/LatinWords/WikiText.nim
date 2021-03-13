@@ -41,6 +41,11 @@ func parseNounTemplate(args: seq[string]): Option[AllWordForms] =
   # Handle declension string
   let declensionStr = args[1].textBetween('<', '>')
 
+  if declensionStr.len == 0:
+    # Indeclinable. TODO
+    assert args.contains("indecl=y")
+    return
+
   case declensionStr[0]:
   of '1': t.declension = NounDeclension.First
   of '2': t.declension = NounDeclension.Second

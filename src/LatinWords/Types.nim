@@ -46,12 +46,18 @@ type
   AllNounForms* = array[Number, array[NounCase, string]]
 
   ### All info needed to produce all forms of a noun
-  ReducedNoun* = object
+  NounTemplate* = object
     nomSing*: string
+    stem2*: string # Something like "pulchr" is for "pulcher"
     gender*: Gender
     declension*: NounDeclension
+    # Boolean fields. These should correspond to '.something' in the declension
+    # field of a Wiktionary noun template, e.g. '1.loc' means 1st declension
+    # where hasLocative=true.
+    hasLocative*: bool
+    hasDativePluralInAbus*: bool
 
-  ReducedVerb* = object
+  VerbTemplate* = object
     principalPart*: array[4, string]
     conjugation*: VerbConjugation
 
@@ -59,9 +65,7 @@ type
     First
 
   NounDeclension* {.pure.} = enum
-    First = "1",
-    FirstWithLocative = "1.loc",
-    FirstWithDativePluralInAbus = "1.abus",
+    First, Second
 
   WordKind* {.pure.} = enum Unknown, Noun, Verb
 

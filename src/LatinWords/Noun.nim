@@ -1,59 +1,29 @@
 import strutils
-import Types
+import Types, NounConstants
 
 # Produce all valid forms of nouns of a given declension.
 # Let's start with second, cause it's simple.
 
 # Forward declarations of public interface
-func declineNoun*(reducedNoun: ReducedNoun): AllWordForms
+func declineNoun*(noun: NounTemplate): AllWordForms
 
 # Forward declarations of private functions
-func firstDeclension(reducedNoun: ReducedNoun): AllWordForms
+func firstDeclension (noun: NounTemplate): AllWordForms
+func secondDeclension(noun: NounTemplate): AllWordForms
 
 
-### Return noun declinations for the given Nominative Singular form according to
-### the type of word in `declension`.
-func declineNoun*(reducedNoun: ReducedNoun): AllWordForms =
-  case reducedNoun.declension
-  of NounDeclension.First, FirstWithLocative, FirstWithDativePluralInAbus:
-    return firstDeclension(reducedNoun)
+# Return noun declinations for the given Nominative Singular form according to
+# the type of word in `declension`.
+func declineNoun*(noun: NounTemplate): AllWordForms =
+  case noun.declension
+  of NounDeclension.First: return firstDeclension(noun)
+  of NounDeclension.Second: return secondDeclension(noun)
 
 #
 #
 # First declension
 #
 #
-
-const
-  UnimplementedNounDeclension = [
-    Number.Single: [ Nom: "", Gen: "", Dat: "", Acc: "", Abl: "", Voc: "", Loc: "" ],
-    Number.Plural: [ Nom: "", Gen: "", Dat: "", Acc: "", Abl: "", Voc: "", Loc: "" ]
-  ]
-
-  StandardNounCaseEndings* = [
-    NounDeclension.First: [
-      Number.Single: [
-        Nom: "a",
-        Gen: "ae",
-        Dat: "ae",
-        Acc: "am",
-        Abl: "ā",
-        Voc: "a",
-        Loc: ""
-      ],
-      Number.Plural: [
-        Nom: "ae",
-        Gen: "ārum",
-        Dat: "īs",
-        Acc: "ās",
-        Abl: "īs",
-        Voc: "ae",
-        Loc: ""
-      ]
-    ],
-    NounDeclension.FirstWithLocative: UnimplementedNounDeclension,
-    NounDeclension.FirstWithDativePluralInAbus: UnimplementedNounDeclension,
-  ]
 
 func firstDeclensionStem(nomSing: string): string =
   let l = nomSing.len
@@ -64,20 +34,16 @@ func firstDeclensionStem(nomSing: string): string =
   else: assert false; return nomSing
 
 ### Produce declinations for a 1st declension noun
-func firstDeclension(reducedNoun: ReducedNoun): AllWordForms =
+func firstDeclension(noun: NounTemplate): AllWordForms =
   let
-    stem = firstDeclensionStem(reducedNoun.nomSing)
-    nomSing = reducedNoun.nomSing
-    hasLocative =
-      (reducedNoun.declension == NounDeclension.FirstWithLocative)
-    hasDativePluralInAbus =
-      (reducedNoun.declension == NounDeclension.FirstWithDativePluralInAbus)
+    nomSing = noun.nomSing
+    stem = firstDeclensionStem(nomSing)
   var
     forms: AllNounForms
     # If the user knows the gender of this noun, use that, otherwise it'll be
     # feminine because this is the first declension, land of the women.
-    retGender = (if reducedNoun.gender == Gender.Unknown: Gender.Feminine
-                 else: reducedNoun.gender)
+    gender = (if noun.gender != Gender.Unknown: noun.gender
+              else: Gender.Feminine)
 
   # Simplest case
   forms[Single][Nom] = stem & "a"
@@ -93,11 +59,11 @@ func firstDeclension(reducedNoun: ReducedNoun): AllWordForms =
   forms[Plural][Abl] = stem & "īs"
   forms[Plural][Voc] = stem & "ae"
 
-  if hasLocative:
+  if noun.hasLocative:
     forms[Single][Loc] = stem & "ae"
     forms[Plural][Loc] = stem & "īs"
 
-  if hasDativePluralInAbus:
+  if noun.hasDativePluralInAbus:
     forms[Plural][Dat] = stem & "ābus"
     forms[Plural][Abl] = stem & "ābus"
 
@@ -123,7 +89,7 @@ func firstDeclension(reducedNoun: ReducedNoun): AllWordForms =
     forms[Single][Abl] = stem & "ē"
     forms[Single][Voc] = stem & "ē"
 
-  return AllWordForms(kind: WordKind.Noun, gender: retGender, nounForms: forms)
+  return AllWordForms(kind: WordKind.Noun, gender: gender, nounForms: forms)
 
 #
 #
@@ -131,55 +97,98 @@ func firstDeclension(reducedNoun: ReducedNoun): AllWordForms =
 #
 #
 
-# func secondDeclension*(nomSing: string,
-#                        options: NounOptions = noNounOptions): Noun =
-#   assert nomSing.endsWith("us") or nomSing.endsWith("um")
-#   let
-#     stem = nomSing[0 ..< nomSing.len - 2]
-#     gender = Masculine # TODO
-#
-#   return case gender
-#   of Masculine, Feminine:
-#     [
-#       Single: [
-#         Nom: nomSing,
-#         Gen: stem & "ī",
-#         Dat: stem & "ō",
-#         Acc: stem & "um",
-#         Abl: stem & "ō",
-#         Voc: stem & "e",
-#         Loc: ""
-#       ],
-#       Plural : [
-#         Nom: stem & "ī",
-#         Gen: stem & "ōrum",
-#         Dat: stem & "īs",
-#         Acc: stem & "ōs",
-#         Abl: stem & "īs",
-#         Voc: stem & "ī",
-#         Loc: ""
-#       ]
-#     ]
-#   of Neuter:
-#     [
-#       Single: [
-#         Nom: nomSing,
-#         Gen: stem & "ī",
-#         Dat: stem & "ō",
-#         Acc: nomSing,
-#         Abl: stem & "ō",
-#         Voc: nomSing,
-#         Loc: ""
-#       ],
-#       Plural : [
-#         Nom: stem & "a",
-#         Gen: stem & "ōrum",
-#         Dat: stem & "īs",
-#         Acc: stem & "a",
-#         Abl: stem & "īs",
-#         Voc: stem & "a",
-#         Loc: ""
-#       ]
-#     ]
-#
-#
+# TODO: Make this smarter, maybe.
+func guessGender(noun: NounTemplate): Gender =
+  let nomSing = noun.nomSing
+  case noun.declension
+  of NounDeclension.First: return Gender.Feminine
+  of NounDeclension.Second:
+    if nomSing.endsWith("um"):
+      return Gender.Neuter
+    else:
+      return Gender.Masculine
+
+  return Gender.Unknown
+
+func secondDeclension(noun: NounTemplate): AllWordForms =
+  assert noun.declension == NounDeclension.Second
+  let
+    nomSing = noun.nomSing
+    stem = (if nomSing.endsWith("us") or nomSing.endsWith("um"):
+              nomSing[0 ..< nomSing.len - 2]
+            else: nomSing)
+    stem2 = (if noun.stem2 != "": noun.stem2
+             else: stem)
+    # Use the user-specified gender if there is one, otherwise masculine.
+    gender = (if noun.gender != Gender.Unknown: noun.gender
+              else: guessGender(noun))
+
+  var forms: AllNounForms
+
+  # Basic case
+  forms[Single][Nom] = nomSing
+  forms[Single][Gen] = stem & "ī"
+  forms[Single][Dat] = stem & "ō"
+  forms[Single][Acc] = stem & "um"
+  forms[Single][Abl] = stem & "ō"
+  forms[Single][Voc] = stem & "e"
+  forms[Single][Loc] = ""
+
+  forms[Plural][Nom] = stem & "ī"
+  forms[Plural][Gen] = stem & "ōrum"
+  forms[Plural][Dat] = stem & "īs"
+  forms[Plural][Acc] = stem & "ōs"
+  forms[Plural][Abl] = stem & "īs"
+  forms[Plural][Voc] = stem & "ī"
+  forms[Plural][Loc] = ""
+
+  if gender == Gender.Neuter:
+    forms[Single][Nom] = stem & "um"
+    forms[Single][Voc] = stem & "um"
+
+    forms[Plural][Nom] = stem & "a"
+    forms[Plural][Acc] = stem & "a"
+    forms[Plural][Voc] = stem & "a"
+
+    # Deliberately ignoring Wiktionary's handling of "-ium" neuter nouns because
+    # to me it looks like they're the same as "-um" neuter nouns except with the
+    # occasional genitive in "-ī" instead of "-iī", which I don't care about.
+
+    # Ignoring -om because it's archaic.
+
+    if nomSing.endsWith("os"):
+      forms[Single][Nom] = stem & "os"
+      forms[Single][Acc] = stem & "os"
+      forms[Single][Voc] = stem & "os"
+
+      forms[Plural][Nom] = stem & "ē"
+      forms[Plural][Gen] = stem & "ōn"
+      forms[Plural][Acc] = stem & "ē"
+      forms[Plural][Voc] = stem & "ē"
+
+    elif nomSing.endsWith("on"):
+      forms[Single][Nom] = stem & "on"
+      forms[Single][Acc] = stem & "on"
+      forms[Single][Voc] = stem & "on"
+
+  elif nomSing.endsWith("r"):
+      forms[Single][Nom] = stem
+      forms[Single][Gen] = stem2 & "ī"
+      forms[Single][Dat] = stem2 & "ō"
+      forms[Single][Acc] = stem2 & "um"
+      forms[Single][Abl] = stem2 & "ō"
+      forms[Single][Voc] = stem
+
+      forms[Plural][Nom] = stem2 & "ī"
+      forms[Plural][Gen] = stem2 & "ōrum"
+      forms[Plural][Dat] = stem2 & "īs"
+      forms[Plural][Acc] = stem2 & "ōs"
+      forms[Plural][Abl] = stem2 & "īs"
+      forms[Plural][Voc] = stem2 & "ī"
+
+  if noun.hasLocative:
+    forms[Single][Loc] = stem2 & "ī"
+    forms[Plural][Loc] = stem2 & "īs"
+
+  return AllWordForms(kind: WordKind.Noun, gender: gender, nounForms: forms)
+

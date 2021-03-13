@@ -5,6 +5,7 @@ import
   LatinWords/Verb,
   LatinWords/VerbConstants,
   LatinWords/Noun,
+  LatinWords/NounConstants,
   LatinWords/WikiText
 
 #
@@ -120,6 +121,7 @@ func identifyVerb*(verb: string): Option[VerbIdentifier] =
               let
                 suffix = StandardVerbFormEndings[c][m][v][a][n][p]
                 suffixNoMacrons = suffix.deMacronise()
+              if suffix.len == 0: continue
               if verb.endsWith(suffix) or verb.endsWith(suffixNoMacrons):
                 let fpp = createFirstPrincipalPartFromStem(stem, conj = c)
                 return some (fpp, m, v, a, n, p)
@@ -133,6 +135,7 @@ func identifyNoun*(noun: string): Option[NounIdentifier] =
         let
           suffix = StandardNounCaseEndings[d][n][c]
           suffixNoMacrons = suffix.deMacronise()
+        if suffix.len == 0: continue
         if noun.endsWith(suffix) or noun.endsWith(suffixNoMacrons):
           let nomSing = createNomSingFromStem(stem, decl = d)
           return some (nomSing, n, c)

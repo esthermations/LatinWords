@@ -26,12 +26,10 @@ func declineNoun*(noun: NounTemplate): AllWordForms =
 #
 
 func firstDeclensionStem(nomSing: string): string =
-  let l = nomSing.len
-  if nomSing.endsWith("a"): return nomSing[0 ..< l-1]
-  elif nomSing.endsWith("ās"): return nomSing[0 ..< l-3]
-  elif nomSing.endsWith("ēs"): return nomSing[0 ..< l-3]
-  elif nomSing.endsWith("ē"): return nomSing[0 ..< l-2]
-  else: assert false; return nomSing
+  let endings = [ "a", "ās", "ēs", "ē" ]
+  for e in endings:
+    if nomSing.endsWith(e):
+      return nomSing[0 .. ^e.len]
 
 ### Produce declinations for a 1st declension noun
 func firstDeclension(noun: NounTemplate): AllWordForms =

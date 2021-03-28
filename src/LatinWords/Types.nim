@@ -125,3 +125,41 @@ func `==`*(a, b: WordForm): bool =
   of WordKind.Unknown: false
   of WordKind.Noun: (a.nounID == b.nounID)
   of WordKind.Verb: (a.verbID == b.verbID)
+
+iterator items*(noun: AllNounForms): WordForm =
+  let nomSing = noun[Number.Single][NounCase.Nom]
+  for n in Number:
+    for c in NounCase:
+      let word = noun[n][c]
+      if word.len != 0:
+        yield WordForm(
+          word: word,
+          kind: WordKind.Noun,
+          nounID: (nomSing, n, c)
+        )
+
+iterator items*(verb: AllVerbalVerbForms): WordForm =
+  let fpp = verb[Mood.Indicative][Voice.Active][Aspect.Present][Number.Single][Person.First]
+  for m in Mood:
+    for v in Voice:
+      for a in Aspect:
+        for n in Number:
+          for p in Person:
+            let word = verb[m][v][a][n][p]
+            if word.len != 0:
+              yield WordForm(
+                word: word,
+                kind: WordKind.Verb,
+                verbID: (fpp, m, v, a, n, p)
+              )
+
+iterator items*(word: AllWordForms): WordForm =
+  case word.kind:
+  of WordKind.Unknown:
+    discard
+  of WordKind.Verb:
+    for f in word.verbForms:
+      yield f
+  of WordKind.Noun:
+    for f in word.nounForms:
+      yield f

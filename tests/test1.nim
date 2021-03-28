@@ -5,13 +5,16 @@ import
   LatinWords/WikiText,
   TestConstants
 
+suite "Eyeball iterator tests":
+  let wordForms = parseTemplate("{{la-verb|1+.poet-sync-perf|amō}}").get()
+  for form in wordForms:
+    echo form.word
+
 suite "getAllWordForms":
   const tests = [
     "{{la-verb|1+.poet-sync-perf|amō}}",
     "{{la-verb|1+|clāmō}}",
   ]
-
-
 
   test "{{la-noun|servus<2>|f=serva}}":
     let t = "{{la-noun|servus<2>|f=serva}}"

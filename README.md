@@ -8,10 +8,10 @@ This is a Nim library intending to replicate the template logic used by Wiktiona
 
  - [x] First declension nouns
  - [x] First conjugation verbs
+ - [x] Second-declension nouns
 
 ## To-do
 
- - [ ] Second-declension nouns
  - [ ] Third-declension nouns
  - [ ] Fourth-declension nouns
  - [ ] Irregular nouns

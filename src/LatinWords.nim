@@ -2,20 +2,12 @@ import
   strutils,
   options,
   LatinWords/Types,
-  LatinWords/Verb,
   LatinWords/VerbConstants,
-  LatinWords/Noun,
   LatinWords/NounConstants,
   LatinWords/WikiText
 
 #
-#
-#
-#
-# Entire public interface.
-#
-#
-#
+# Public interface.
 #
 
 func getAllWordForms*(wiktionaryTemplate: string): AllWordForms
@@ -72,22 +64,18 @@ func createNomSingFromStem(stem: string, decl: NounDeclension): string =
 # Try and find the verb stem in a macron-agnostic way.
 func getVerbStem*(verb: string): string =
   for c in VerbConjugation:
-    for m in Mood:
-      for v in Voice:
-        for a in Aspect:
-          for n in Number:
-            for p in Person:
-              let
-                suffix = StandardVerbFormEndings[c][m][v][a][n][p]
-                suffixNoMacrons = suffix.deMacronise()
-              if suffix.len == 0:
-                continue
-              if verb.endsWith(suffix):
-                let stem = verb[0 ..< verb.len - suffix.len]
-                return stem
-              elif verb.endsWith(suffixNoMacrons):
-                let stem = verb[0 ..< verb.len - suffixNoMacrons.len]
-                return stem
+    for form in StandardVerbFormEndings[c]:
+      let
+        suffix = form.word
+        suffixNoMacrons = suffix.deMacronise()
+      if suffix.len == 0:
+        continue
+      if verb.endsWith(suffix):
+        let stem = verb[0 ..< verb.len - suffix.len]
+        return stem
+      elif verb.endsWith(suffixNoMacrons):
+        let stem = verb[0 ..< verb.len - suffixNoMacrons.len]
+        return stem
   # Default value
   return ""
 

@@ -16,7 +16,7 @@ const
     ]
   ]
 
-  StandardVerbFormEndings* = [
+  StandardVerbFormEndings*: array[VerbConjugation, AllVerbalVerbForms] = [
 
     #
     #

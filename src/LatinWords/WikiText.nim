@@ -24,10 +24,6 @@ func guessGender(args: seq[string]): Gender =
   if args.count("g=n") > 0: return Gender.Neuter
   return Gender.Unknown
 
-#test "getNounsFromTemplateArgument":
-  #check getReducedNounFromTemplateArgument("{{la-noun|via<1>}}") == ("via", "1", "f")
-  #check getReducedNounFromTemplateArgument("{{la-proper noun|Abaddōn|g=m|indecl=1}}") == ReducedNoun(word: "Abaddōn", "indecl")]
-
 func parseNounTemplate(args: seq[string]): Option[AllWordForms] =
   # For example:
   # {{la-noun|ager/agr<2>}}
@@ -36,7 +32,6 @@ func parseNounTemplate(args: seq[string]): Option[AllWordForms] =
   assert args[0] in NounKeywords
   var t: NounTemplate
   t.gender = guessGender(args)
-
 
   # Handle declension string
   let declensionStr = args[1].textBetween('<', '>')

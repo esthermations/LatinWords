@@ -29,7 +29,7 @@ const
         Dat: "ō",
         Acc: "um",
         Abl: "ō",
-        Voc: "us",
+        Voc: "e",
         Loc: ""
       ],
       Number.Plural: [

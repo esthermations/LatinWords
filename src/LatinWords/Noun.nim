@@ -44,18 +44,9 @@ func firstDeclension(noun: NounTemplate): AllWordForms =
               else: Gender.Feminine)
 
   # Simplest case
-  forms[Single][Nom] = stem & "a"
-  forms[Single][Gen] = stem & "ae"
-  forms[Single][Dat] = stem & "ae"
-  forms[Single][Acc] = stem & "am"
-  forms[Single][Abl] = stem & "ā"
-  forms[Single][Voc] = stem & "a"
-  forms[Plural][Nom] = stem & "ae"
-  forms[Plural][Gen] = stem & "ārum"
-  forms[Plural][Dat] = stem & "īs"
-  forms[Plural][Acc] = stem & "ās"
-  forms[Plural][Abl] = stem & "īs"
-  forms[Plural][Voc] = stem & "ae"
+  for n in Number:
+    for c in NounCase:
+      forms[n][c] = stem & StandardNounCaseEndings[NounDeclension.First][n][c]
 
   if noun.hasLocative:
     forms[Single][Loc] = stem & "ae"
@@ -95,7 +86,7 @@ func firstDeclension(noun: NounTemplate): AllWordForms =
 #
 #
 
-# TODO: Make this smarter, maybe.
+# FIXME: duplicated function also exists in WikiText.nim
 func guessGender(noun: NounTemplate): Gender =
   let nomSing = noun.nomSing
   case noun.declension
@@ -105,7 +96,6 @@ func guessGender(noun: NounTemplate): Gender =
       return Gender.Neuter
     else:
       return Gender.Masculine
-
   return Gender.Unknown
 
 func secondDeclension(noun: NounTemplate): AllWordForms =
@@ -113,32 +103,19 @@ func secondDeclension(noun: NounTemplate): AllWordForms =
   let
     nomSing = noun.nomSing
     stem = (if nomSing.endsWith("us") or nomSing.endsWith("um"):
-              nomSing[0 ..< nomSing.len - 2]
+              nomSing[0 ..^ 3]
             else: nomSing)
-    stem2 = (if noun.stem2 != "": noun.stem2
-             else: stem)
-    # Use the user-specified gender if there is one, otherwise masculine.
+    stem2 = (if noun.stem2.len != 0: noun.stem2 else: stem)
+    # Use the user-specified gender if there is one, otherwise guess it idk.
     gender = (if noun.gender != Gender.Unknown: noun.gender
               else: guessGender(noun))
 
   var forms: AllNounForms
 
   # Basic case
-  forms[Single][Nom] = nomSing
-  forms[Single][Gen] = stem & "ī"
-  forms[Single][Dat] = stem & "ō"
-  forms[Single][Acc] = stem & "um"
-  forms[Single][Abl] = stem & "ō"
-  forms[Single][Voc] = stem & "e"
-  forms[Single][Loc] = ""
-
-  forms[Plural][Nom] = stem & "ī"
-  forms[Plural][Gen] = stem & "ōrum"
-  forms[Plural][Dat] = stem & "īs"
-  forms[Plural][Acc] = stem & "ōs"
-  forms[Plural][Abl] = stem & "īs"
-  forms[Plural][Voc] = stem & "ī"
-  forms[Plural][Loc] = ""
+  for n in Number:
+    for c in NounCase:
+      forms[n][c] = stem & StandardNounCaseEndings[NounDeclension.Second][n][c]
 
   if gender == Gender.Neuter:
     forms[Single][Nom] = stem & "um"
